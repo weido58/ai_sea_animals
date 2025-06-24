@@ -388,5 +388,462 @@ public class MarineRecognitionApplication {
 
 ~~~
 
+# 1. 前后端分离概述
+
+## 1.1 概述
+
+**前后端分离**是一种现代化的开发模式，将前端（用户界面）和后端（业务逻辑、数据处理）解耦。它的主要目标是提高开发效率，增强前后端的独立性和灵活性，支持团队协作开发。
+
+## 1.2 核心特点：
+
+1. **职责分离**：前端负责页面展示和交互，后端负责数据处理和逻辑实现。
+2. **接口通信**：通过 API（通常是 RESTful 风格）进行数据交换。
+3. **并行开发**：前后端开发可以同时进行，提高开发效率。
+4. **灵活性增强**：前端技术可以自由选择，后端可以独立扩展。
+
+## 1.3 技术栈分析
+
+#### 1. **前端技术**
+
+- 框架：Vite + Vue
+  - **Vite**：一种现代化的前端构建工具，支持快速开发和高效热更新，适合 Vue 项目。
+  - **Vue**：轻量、高效的渐进式前端框架，支持数据绑定和组件化开发。
+- AJAX 框架：Axios
+  - Axios 是一个基于 Promise 的 HTTP 客户端，支持向后端发送异步请求，适用于 Vue 生态。
+  - 用于实现数据动态加载、表单提交等操作。
+
+#### 2. **后端技术**
+
+- Springboot框架
+
+#### 3. **数据库**
+
+- MySQL 8.0
+  - 关系型数据库，支持强大的 SQL 查询，适用于构建数据持久层。
+
+## 1.4 前后端交互流程
+
+1. **用户操作**：用户通过前端页面触发事件（如表单提交）。
+
+2. **前端请求**：前端通过 Axios 发送 HTTP 请求（如 GET/POST）到后端接口。
+
+3. 后端处理
+
+   - Springboot接收请求，调用业务逻辑。
+   - JDBC 操作数据库，完成数据查询或修改。
+
+4. **返回响应**：后端通过 Springboot将数据封装为 JSON 格式返回。
+
+5. **前端渲染**：前端解析 JSON 数据，更新页面内容。
+
+### 1.4.1 编写发布接口分析
+
+- 根据用户字段 `id`、`userName` 和 `passWord` 的要求，以下是 API 的详细描述、输入参数以及输出 JSON 格式。
+
+#### **路径**: `/doUserList`
+
+**描述**: 获取所有用户的列表。
+**输入参数**:
+
+- **请求方法**: `GET`
+- **不需要额外的输入参数**
+
+**输出 JSON 格式**:
+
+- 成功:
+
+  ~~~ json
+  {
+    "processResult": "SUCCESS",
+    "queryResultData": [
+      {
+        "id": 1,
+        "userName": "张三",
+        "passWord": "123456"
+      },
+      {
+        "id": 2,
+        "userName": "李四",
+        "passWord": "abcdef"
+      }
+    ],
+    "errorMessage": null
+  }
+  ~~~
+
+  
+
+- 失败:
+
+  ```
+  {
+    "processResult": "FAILED",
+    "queryResultData": null,
+    "errorMessage": "错误信息"
+  }
+  ```
+
+#### **路径**: `/doUserRemove`
+
+**描述**: 根据用户 ID 删除指定用户。
+**输入参数**:
+
+- **请求方法**: `GET`
+- 查询参数:
+  - `id` (必填, `Long`): 要删除的用户 ID。
+
+**输出 JSON 格式**:
+
+- 成功:
+
+  ```
+  {
+    "processResult": "SUCCESS",
+    "queryResultData": null,
+    "errorMessage": null
+  }
+  ```
+
+- 失败:
+
+  ```
+  {
+    "processResult": "FAILED",
+    "queryResultData": null,
+    "errorMessage": "错误信息"
+  }
+  ```
+
+#### **路径**: `/doUserEditSave`
+
+**描述**: 更新用户信息。
+**输入参数**:
+
+- **请求方法**: `POST`
+
+- 请求体
+
+  （
+
+  ```
+  application/json
+  ```
+
+  ）:
+
+  ```
+  {
+    "id": 1,
+    "userName": "张三",
+    "passWord": "newPassword123"
+  }
+  ```
+
+**输出 JSON 格式**:
+
+- 成功:
+
+  ```
+  {
+    "processResult": "SUCCESS",
+    "queryResultData": null,
+    "errorMessage": null
+  }
+  ```
+
+- 失败:
+
+  ```
+  {
+    "processResult": "FAILED",
+    "queryResultData": null,
+    "errorMessage": "错误信息"
+  }
+  ```
+
+#### **路径**: `/doFindUserById`
+
+**描述**: 根据用户 ID 获取用户详细信息。
+**输入参数**:
+
+- **请求方法**: `GET`
+- 查询参数:
+  - `id` (必填, `Long`): 要查询的用户 ID。
+
+**输出 JSON 格式**:
+
+- 成功:
+
+  ```
+  {
+    "processResult": "SUCCESS",
+    "queryResultData": {
+      "id": 1,
+      "userName": "张三",
+      "passWord": "123456"
+    },
+    "errorMessage": null
+  }
+  ```
+
+- 失败:
+
+  ```
+  {
+    "processResult": "FAILED",
+    "queryResultData": null,
+    "errorMessage": "错误信息"
+  }
+  ```
+
+####  **路径**: `/doUserAddSave`
+
+**描述**: 添加新用户。
+**输入参数**:
+
+- **请求方法**: `POST`
+
+- 请求体
+
+  （
+
+  ```
+  application/json
+  ```
+
+  ）
+
+  ```
+  {
+    "userName": "赵六",
+    "passWord": "password789"
+  }
+  ```
+
+**输出 JSON 格式**:
+
+- 成功:
+
+  ```
+  {
+    "processResult": "SUCCESS",
+    "queryResultData": null,
+    "errorMessage": null
+  }
+  ```
+
+- 失败:
+
+  ```
+  {
+    "processResult": "FAILED",
+    "queryResultData": null,
+    "errorMessage": "错误信息"
+  }
+  ```
+
+### 1.4.2 实现接口功能
+
+实现了一个基类 ServletParent，提供了一种基于 请求路径反射调用方法 的通用实现，
+
+若用户访问路径 `/doUserList`，具体调用过程如下：
+
+1. **获取请求 URI**: `/doUserList`
+2. **提取方法名称**: `doUserList`
+3. 反射查找并调用方法
+   - 在 `UserApiController` 类中找到名为 `doUserList` 的方法。
+   - 执行对应的用户查询逻辑并返回结果。
+
+#### Result类
+
+~~~ java
+package com.gec.marine.entity;
+
+public class Result<T>
+{
+
+    // 声明常量，表示请求处理成功这个状态
+    public static final String SUCCESS = "SUCCESS";
+
+    // 声明常量，表示请求处理失败这个状态
+    public static final String FAILED = "FAILED";
+
+    // 请求处理的结果，是成功还是失败
+    private String processResult;
+    // 查询结果
+    private T queryResultData;
+    // 请求处理失败时，错误消息
+    private String errorMessage;
+    /**
+     * 工具方法：处理请求成功，没有查询结果需要返回
+     * @return
+     */
+    public static Result ok() {
+
+        Result result = new Result();
+        result.setProcessResult(SUCCESS);
+        return result;
+    }
+
+    /**
+     * 工具方法：处理请求成功，并且有查询结果需要封装
+     * @param queryResultData
+     * @return
+     * @param <T>
+     */
+    public static <T> Result<T> ok(T queryResultData) {
+
+        Result result = new Result();
+
+        result.setProcessResult(SUCCESS);
+        result.setQueryResultData(queryResultData);
+
+        return result;
+    }
+
+    /**
+     * 工具方法：处理请求失败
+     * @param errorMessage
+     * @return
+     */
+    public static Result failed(String errorMessage) {
+
+        Result result = new Result();
+        result.setProcessResult(FAILED);
+        result.setErrorMessage(errorMessage);
+
+        return result;
+    }
+
+    public String getProcessResult() {
+        return processResult;
+    }
+
+    public void setProcessResult(String processResult) {
+        this.processResult = processResult;
+    }
+
+    public T getQueryResultData() {
+        return queryResultData;
+    }
+
+    public void setQueryResultData(T queryResultData) {
+        this.queryResultData = queryResultData;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    @Override
+    public String toString() {
+        return "Result{" +
+                "processResult='" + processResult + '\'' +
+                ", queryResultData=" + queryResultData +
+                ", errorMessage='" + errorMessage + '\'' +
+                '}';
+    }
+
+    public Result(String processResult, T queryResultData, String errorMessage) {
+        this.processResult = processResult;
+        this.queryResultData = queryResultData;
+        this.errorMessage = errorMessage;
+    }
+
+    public Result() {
+    }
+
+
+}
+
+~~~
+
+### 1.4.3 UserController控制器
+
+~~~ java
+package com.gec.marine.controller;
+
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gec.marine.entity.Result;
+import com.gec.marine.entity.SysUser;
+import com.gec.marine.service.SysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+    @Autowired
+    private SysUserService sysUserService;
+    @GetMapping("/doUserList")
+    public Result<List<SysUser>> getAllUsers(){
+        List<SysUser> sysUserList = sysUserService.list();
+        return Result.ok(sysUserList);
+    }
+
+
+    // http:/xxx/1
+    // http:/xxx/2
+    // http:/xxx/3
+    // 根据 ID 查询用户
+    @GetMapping("/doFindUserById/{id}")
+    public Result<SysUser> getUserById(@PathVariable("id") Long id)
+    {
+        SysUser sysUser = sysUserService.getById(id);
+        return Result.ok(sysUser);
+    }
+
+    // 添加用户
+    @PostMapping("/doUserAddSave")
+    public Result addUser(@RequestBody SysUser sysUser){
+
+        boolean flag = sysUserService.save(sysUser);
+        if(flag){
+            return Result.ok();
+        }else
+            return Result.failed("添加用户数据失败");
+    }
+
+    //删除用户
+    @DeleteMapping("/doUserRemove/{id}")
+    public Result deleteUser(@PathVariable("id") Long id)
+    {
+        boolean flag = sysUserService.removeById(id);
+        if(flag){
+            return Result.ok();
+        }else
+            return Result.failed("删除用户数据失败");
+    }
+
+    @PutMapping("/doUserEditSave")
+    //更新操作
+    public Result updateUser(@RequestBody SysUser sysUser){
+        boolean flag = sysUserService.updateById(sysUser);
+        if(flag){
+            return Result.ok();
+        }else
+            return Result.failed("更新用户失败");
+    }
+}
+
+~~~
+
+
+
+## 1.6 测试接口
+
+- 启动tomcat，打开浏览器输入地址：http://localhost:8080/user_server/doFindUserById?id=1
+
+![image-20241207123050948](../../../海洋生物ai/day01/2、前后端分离实现-用户列表功能实现/2、前后端分离实现-用户列表功能实现/教案/images/后端实现/image-20241207123050948.png)
+
+
+
 
 
