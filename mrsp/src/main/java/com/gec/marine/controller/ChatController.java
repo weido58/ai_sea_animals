@@ -1,8 +1,11 @@
 package com.gec.marine.controller;
 
 import com.gec.marine.config.AssistantConfig;
+import dev.langchain4j.service.TokenStream;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 /**
  * 聊天控制器
@@ -53,4 +56,28 @@ public class ChatController {
 //        // 发送固定的问候消息给AI
 //        return chatService.chat("你好，你是谁？");
 //    }
+    // 定义HTTP接口端点，处理带有记忆功能的流式聊天请求
+    @RequestMapping(value = "/memory_steam_chat",produces = "text/stream;charset=utf-8")
+// 返回Flux<String>类型实现流式响应，参数message默认值为"我是谁"
+    public Flux<String> memoryStreamChat(
+            // 从请求参数获取用户消息，默认值"我是谁"
+            @RequestParam(defaultValue = "我是谁") String message,
+            // 注入HttpServletResponse对象（虽然响应式编程中通常不直接使用）
+            HttpServletResponse response) {
+
+        // 调用助手服务的流式接口，获取TokenStream对象
+        TokenStream stream = assistant.stream(message);
+
+        // 创建Flux流式响应
+        return Flux.create(sink -> {
+            // 设置部分响应回调：每次收到部分响应时通过sink发送数据
+            stream.onPartialResponse(s -> sink.next(s))
+                    // 设置完成回调：当收到完成信号时关闭流
+                    .onCompleteResponse(c-> sink.complete())
+                    // 设置错误回调：发生错误时传递错误信号 它的作用是将 sink 对象的 error 方法作为函数式接口的实现传递进去。
+                    .onError(sink::error)//stream.onError(error -> sink.error(error));
+                    // 启动流处理
+                    .start();
+        });
+    }
 }
