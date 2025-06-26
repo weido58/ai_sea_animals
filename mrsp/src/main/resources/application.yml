@@ -38,5 +38,10 @@ server:
   port: 8080
   servlet:
     context-path: /mrsp_server
-
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: sk-91336a4d917b4575890fcf7c9ba7d3c3
+      base-url: https://api.deepseek.com
+      model-name: deepseek-chat
 
