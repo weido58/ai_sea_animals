@@ -1,0 +1,29 @@
+# 通义千问配置
+qwen:
+  api-key: sk-9a404f2f05c14a76a1a219a09859a904
+  chat-model: qwen-plus
+  embedding-model: text-embedding-v1
+  temperature: 0.3
+  max-tokens: 2000
+# RAG配置
+rag:
+  max-results: 3
+  min-score: 0.5
+  chunk-size: 500
+server:
+  port: 8080
+spring:
+  application:
+    name: flight-rag-system
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Shanghai
+deepseek:
+  api-key: sk-91336a4d917b4575890fcf7c9ba7d3c3
+  model: deepseek-chat
+  base-url: https://api.deepseek.com/v1
+  timeout: 60
+  max-tokens: 4000
+  temperature: 0.3
