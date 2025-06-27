@@ -44,4 +44,18 @@ langchain4j:
       api-key: sk-91336a4d917b4575890fcf7c9ba7d3c3
       base-url: https://api.deepseek.com
       model-name: deepseek-chat
+# 通义千问配置
+qwen:
+  api-key: sk-9a404f2f05c14a76a1a219a09859a904
+  chat-model: qwen-plus
+  embedding-model: text-embedding-v1
+  temperature: 0.3
+  max-tokens: 2000
+deepseek:
+  api-key: sk-91336a4d917b4575890fcf7c9ba7d3c3
+  model: deepseek-chat
+  base-url: https://api.deepseek.com/v1
+  timeout: 60
+  max-tokens: 4000
+  temperature: 0.3
 

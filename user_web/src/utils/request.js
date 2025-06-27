@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 // 创建axios实例
 const request = axios.create({
   baseURL: '/api', // 基础URL
-  timeout: 10000,  // 请求超时时间
+  timeout: 100000,  // 请求超时时间
   headers: {
     'Content-Type': 'application/json;charset=UTF-8'
   }

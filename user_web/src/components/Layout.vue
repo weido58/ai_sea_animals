@@ -119,7 +119,8 @@ const isCollapsed = ref(false) // 侧边栏折叠状态
 const menuItems = [
   { path: '/dashboard', title: '仪表板', icon: 'House' },
   { path: '/users', title: '用户管理', icon: 'User' },
-  { path: '/settings', title: '系统设置', icon: 'Setting' }
+  { path: '/settings', title: '系统设置', icon: 'Setting' },
+    { path: '/MarineBiology', title: '海洋生物AI助手', icon: 'Setting' }
 ]
 
 // 计算当前激活的菜单项

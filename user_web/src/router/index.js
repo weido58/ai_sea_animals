@@ -44,7 +44,16 @@ const routes = [
           title: '系统设置',
           icon: 'Setting'
         }
-      }
+      },
+            {
+                path: 'MarineBiology',
+                name: 'MarineBiology',
+                component: () => import('../views/MarineBiologyAssistant.vue'),
+                meta: {
+                    title: '海洋生物AI助手',
+                    icon: 'Setting'
+                }
+            }
     ]
   }
 ]
