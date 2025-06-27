@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海洋生物识别系统</title>
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        }
+
+        .container {
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 20px;
+          padding: 40px;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+          backdrop-filter: blur(10px);
+          max-width: 600px;
+          width: 100%;
+          text-align: center;
+        }
+
+        h1 {
+          color: #333;
+          font-size: 2.5rem;
+          margin-bottom: 10px;
+          font-weight: 600;
+        }
+
+        .subtitle {
+          color: #666;
+          font-size: 1.1rem;
+          margin-bottom: 30px;
+        }
+
+        .upload-area {
+          border: 3px dashed #4f46e5;
+          border-radius: 15px;
+          padding: 40px 20px;
+          margin: 30px 0;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .upload-area:hover {
+          border-color: #3730a3;
+          background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+          transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+          border-color: #1e40af;
+          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+          transform: scale(1.02);
+        }
+
+        .upload-icon {
+          font-size: 3rem;
+          color: #4f46e5;
+          margin-bottom: 15px;
+        }
+
+        .upload-text {
+          color: #4b5563;
+          font-size: 1.1rem;
+          margin-bottom: 10px;
+        }
+
+        .upload-hint {
+          color: #9ca3af;
+          font-size: 0.9rem;
+        }
+
+        .file-input {
+          display: none;
+        }
+
+        .preview-area {
+          margin: 20px 0;
+          display: none;
+        }
+
+        .preview-image {
+          max-width: 100%;
+          max-height: 300px;
+          border-radius: 10px;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .upload-btn {
+          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+          color: white;
+          border: none;
+          padding: 12px 30px;
+          border-radius: 25px;
+          font-size: 1.1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin: 20px 10px;
+          font-weight: 500;
+        }
+
+        .upload-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        .upload-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+
+        .nav-btn {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          color: white;
+          text-decoration: none;
+          padding: 10px 20px;
+          border-radius: 20px;
+          margin: 10px;
+          display: inline-block;
+          transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+          text-decoration: none;
+          color: white;
+        }
+
+        .loading {
+          display: none;
+          margin: 20px 0;
+        }
+
+        .spinner {
+          border: 4px solid #f3f4f6;
+          border-top: 4px solid #4f46e5;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+          padding: 15px 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          font-weight: 500;
+        }
+
+        .alert-success {
+          background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+          color: #065f46;
+          border-left: 4px solid #10b981;
+        }
+
+        .alert-error {
+          background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+          color: #991b1b;
+          border-left: 4px solid #ef4444;
+        }
+
+        .progress-bar {
+          width: 100%;
+          height: 4px;
+          background: #e5e7eb;
+          border-radius: 2px;
+          overflow: hidden;
+          margin: 20px 0;
+          display: none;
+        }
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #4f46e5, #7c3aed);
+          width: 0%;
+          transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+          .container {
+            padding: 20px;
+            margin: 10px;
+          }
+
+          h1 {
+            font-size: 2rem;
+          }
+
+          .upload-area {
+            padding: 30px 15px;
+          }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🐠 海洋生物识别系统</h1>
+    <p class="subtitle">上传海洋生物图片，AI智能识别物种信息</p>
+
+    <!-- 成功提示 -->
+    <div th:if="${success}" class="alert alert-success">
+        <span th:text="${success}"></span>
+    </div>
+
+    <!-- 错误提示 -->
+    <div th:if="${error}" class="alert alert-error">
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- 上传表单 -->
+    <form id="uploadForm" th:action="@{/marine/upload}" method="post" enctype="multipart/form-data">
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📸</div>
+            <div class="upload-text">点击选择图片或拖拽图片到此处</div>
+            <div class="upload-hint">支持 JPG、PNG、GIF 格式，最大 10MB</div>
+            <input type="file" id="imageFile" name="imageFile" class="file-input" accept="image/*">
+        </div>
+
+        <!-- 图片预览 -->
+        <div class="preview-area" id="previewArea">
+            <img id="previewImage" class="preview-image" alt="预览图片">
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>AI正在识别中，请稍候...</p>
+        </div>
+
+        <!-- 按钮 -->
+        <button type="submit" class="upload-btn" id="uploadBtn" disabled>
+            🚀 开始识别
+        </button>
+    </form>
+
+    <!-- 导航按钮 -->
+    <div style="margin-top: 30px;">
+        <a href="/marine/list" class="nav-btn">📋 查看识别记录</a>
+        <a href="/marine/batch" class="nav-btn">📦 批量上传</a>
+    </div>
+</div>
+
+<script>
+    // DOM 元素
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('imageFile');
+    const previewArea = document.getElementById('previewArea');
+    const previewImage = document.getElementById('previewImage');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const loading = document.getElementById('loading');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+    const uploadForm = document.getElementById('uploadForm');
+
+    // 点击上传区域
+    uploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // 文件选择
+    fileInput.addEventListener('change', handleFileSelect);
+
+    // 拖拽功能
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        handleFileSelect();
+      }
+    });
+
+    // 处理文件选择
+    function handleFileSelect() {
+      const file = fileInput.files[0];
+
+      if (!file) {
+        uploadBtn.disabled = true;
+        previewArea.style.display = 'none';
+        return;
+      }
+
+      // 验证文件类型
+      if (!file.type.startsWith('image/')) {
+        alert('请选择图片文件！');
+        return;
+      }
+
+      // 验证文件大小
+      if (file.size > 10 * 1024 * 1024) {
+        alert('图片文件大小不能超过10MB！');
+        return;
+      }
+
+      // 显示预览
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImage.src = e.target.result;
+        previewArea.style.display = 'block';
+        uploadBtn.disabled = false;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 表单提交
+    uploadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if (!fileInput.files[0]) {
+        alert('请先选择图片！');
+        return;
+      }
+
+      // 显示加载状态
+      loading.style.display = 'block';
+      progressBar.style.display = 'block';
+      uploadBtn.disabled = true;
+
+      // 模拟进度
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 90) {
+          progress = 90;
+          clearInterval(progressInterval);
+        }
+        progressFill.style.width = progress + '%';
+      }, 200);
+
+      // 使用AJAX提交
+      const formData = new FormData(uploadForm);
+
+      fetch('/marine/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+              .then(response => response.json())
+              .then(data => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+
+                setTimeout(() => {
+                  loading.style.display = 'none';
+                  progressBar.style.display = 'none';
+                  uploadBtn.disabled = false;
+
+                  if (data.success) {
+                    // 成功跳转到详情页
+                    window.location.href = '/marine/detail/' + data.data.id;
+                  } else {
+                    alert('识别失败: ' + data.message);
+                    progressFill.style.width = '0%';
+                  }
+                }, 500);
+              })
+              .catch(error => {
+                clearInterval(progressInterval);
+                loading.style.display = 'none';
+                progressBar.style.display = 'none';
+                uploadBtn.disabled = false;
+                progressFill.style.width = '0%';
+
+                console.error('Error:', error);
+                alert('网络错误，请重试！');
+              });
+    });
+
+    // 页面加载完成后的动画
+    window.addEventListener('load', () => {
+      document.querySelector('.container').style.opacity = '0';
+      document.querySelector('.container').style.transform = 'translateY(20px)';
+
+      setTimeout(() => {
+        document.querySelector('.container').style.transition = 'all 0.6s ease';
+        document.querySelector('.container').style.opacity = '1';
+        document.querySelector('.container').style.transform = 'translateY(0)';
+      }, 100);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${species != null ? species.chineseName + ' - 海洋物种详情' : '海洋物种详情'}">海洋物种详情</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .species-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+        .species-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .species-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .species-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+        .info-section {
+            padding: 2rem;
+        }
+        .info-item {
+            background: rgba(79, 172, 254, 0.1);
+            border-left: 4px solid #4facfe;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+        .info-item:hover {
+            background: rgba(79, 172, 254, 0.2);
+            transform: translateX(5px);
+        }
+        .info-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .info-label i {
+            margin-right: 0.5rem;
+            color: #4facfe;
+        }
+        .info-value {
+            color: #555;
+            line-height: 1.6;
+        }
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .species-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .species-image:hover {
+            transform: scale(1.05);
+        }
+        .conservation-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .status-low-risk { background: #d4edda; color: #155724; }
+        .status-near-threatened { background: #fff3cd; color: #856404; }
+        .status-vulnerable { background: #f8d7da; color: #721c24; }
+        .status-endangered { background: #f5c6cb; color: #721c24; }
+        .status-critically-endangered { background: #f1b0b7; color: #721c24; }
+        .status-extinct { background: #d6d8db; color: #383d41; }
+        .btn-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        .error-container {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+        .classification-tree {
+            background: rgba(79, 172, 254, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+        }
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+        .modal-body {
+            padding: 0;
+        }
+        .modal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+
+    <!-- 物种详情页面 -->
+    <div th:if="${species}" class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="species-card">
+                <!-- 头部信息 -->
+                <div class="species-header">
+                    <h1 class="species-title" th:text="${species.chineseName ?: '未知物种'}">中文名</h1>
+                    <p class="species-subtitle" th:text="${species.scientificName}">学名</p>
+                    <p class="species-subtitle" th:if="${species.commonName}" th:text="'俗名: ' + ${species.commonName}">俗名</p>
+                </div>
+
+                <!-- 详细信息 -->
+                <div class="info-section">
+                    <!-- 基本信息 -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item" th:if="${species.scientificName}">
+                                <div class="info-label">
+                                    <i class="fas fa-microscope"></i>
+                                    学名 (Scientific Name)
+                                </div>
+                                <div class="info-value" th:text="${species.scientificName}">学名</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item" th:if="${species.commonName}">
+                                <div class="info-label">
+                                    <i class="fas fa-comment"></i>
+                                    俗名 (Common Name)
+                                </div>
+                                <div class="info-value" th:text="${species.commonName}">俗名</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 保护状状态 -->
+                    <div th:if="${species.conservationStatus}" class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-shield-alt"></i>
+                            保护状态 (Conservation Status)
+                        </div>
+                        <div class="info-value">
+                                <span class="conservation-status" th:text="${species.conservationStatus}">
+                                    保护状态
+                                </span>
+                        </div>
+                    </div>
+
+                    <!-- 分类信息 -->
+                    <div th:if="${species.classification}" class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-sitemap"></i>
+                            分类信息 (Classification)
+                        </div>
+                        <div class="info-value">
+                            <div class="classification-tree" th:utext="${species.classification}">分类信息</div>
+                        </div>
+                    </div>
+
+                    <!-- 形态特征 -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div th:if="${species.characteristics}" class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-eye"></i>
+                                    形态特征 (Characteristics)
+                                </div>
+                                <div class="info-value" th:text="${species.characteristics}">特征描述</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div th:if="${species.sizeRange}" class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-ruler"></i>
+                                    体型范围 (Size Range)
+                                </div>
+                                <div class="info-value" th:text="${species.sizeRange}">体型范围</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 生态信息 -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div th:if="${species.habitat}" class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-home"></i>
+                                    栖息地 (Habitat)
+                                </div>
+                                <div class="info-value" th:text="${species.habitat}">栖息地描述</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div th:if="${species.distribution}" class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-globe"></i>
+                                    分布区域 (Distribution)
+                                </div>
+                                <div class="info-value" th:text="${species.distribution}">分布区域</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 食性 -->
+                    <div th:if="${species.diet}" class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-utensils"></i>
+                            食性 (Diet)
+                        </div>
+                        <div class="info-value" th:text="${species.diet}">食性描述</div>
+                    </div>
+
+                    <!-- 详细描述 -->
+                    <div th:if="${species.description}" class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-info-circle"></i>
+                            详细描述 (Description)
+                        </div>
+                        <div class="info-value" th:utext="${#strings.replace(species.description, '\\n', '<br>')}">详细描述</div>
+                    </div>
+
+                    <!-- 图片展示 -->
+                    <div th:if="${species.imageUrls}" class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-images"></i>
+                            参考图片 (Reference Images)
+                        </div>
+                        <div class="image-gallery">
+                            <!-- 这里需要在Controller中解析JSON数组 -->
+                            <div th:each="imageUrl : ${imageUrlList}">
+                                <img th:src="${imageUrl}"
+                                     class="species-image"
+                                     alt="物种图片"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#imageModal"
+                                     th:onclick="'showImage(\'' + ${imageUrl} + '\')'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 时间信息 -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div th:if="${species.createdTime}" class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    创建时间
+                                </div>
+                                <div class="info-value" th:text="${#temporals.format(species.createdTime, 'yyyy-MM-dd HH:mm:ss')}">创建时间</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div th:if="${species.updatedTime}" class="info-item">
+                                <div class="info-label">
+                                    <i class="fas fa-calendar-check"></i>
+                                    更新时间
+                                </div>
+                                <div class="info-value" th:text="${#temporals.format(species.updatedTime, 'yyyy-MM-dd HH:mm:ss')}">更新时间</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="text-center mt-4">
+                        <a href="javascript:history.back()" class="btn btn-back me-3">
+                            <i class="fas fa-arrow-left"></i> 返回上一页
+                        </a>
+                        <a href="/species/list" class="btn btn-back">
+                            <i class="fas fa-list"></i> 返回列表
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 图片模态框 -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">物种图片</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" src="" class="modal-image" alt="物种图片">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showImage(imageUrl) {
+        document.getElementById('modalImage').src = imageUrl;
+    }
+
+    // 页面加载完成后的初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 为分类信息添加JSON格式化显示
+        const classificationElements = document.querySelectorAll('.classification-tree');
+        classificationElements.forEach(element => {
+            try {
+                const text = element.textContent;
+                if (text.trim().startsWith('{') || text.trim().startsWith('[')) {
+                    const jsonObj = JSON.parse(text);
+                    element.innerHTML = '<pre>' + JSON.stringify(jsonObj, null, 2) + '</pre>';
+                }
+            } catch (e) {
+                // 如果不是JSON格式，保持原样
+            }
+        });
+
+        // 为长文本添加展开/收起功能
+        const longTexts = document.querySelectorAll('.info-value');
+        longTexts.forEach(element => {
+            if (element.textContent.length > 200) {
+                const fullText = element.textContent;
+                const shortText = fullText.substring(0, 200) + '...';
+                element.innerHTML = shortText +
+                    '<br><a href="#" class="text-primary text-decoration-none" onclick="toggleText(this, \'' +
+                    fullText.replace(/'/g, "\\'") + '\')">展开更多</a>';
+            }
+        });
+    });
+
+    function toggleText(link, fullText) {
+        const parent = link.parentElement;
+        if (link.textContent === '展开更多') {
+            parent.innerHTML = fullText +
+                '<br><a href="#" class="text-primary text-decoration-none" onclick="toggleText(this, \'' +
+                fullText.replace(/'/g, "\\'") + '\')">收起</a>';
+        } else {
+            const shortText = fullText.substring(0, 200) + '...';
+            parent.innerHTML = shortText +
+                '<br><a href="#" class="text-primary text-decoration-none" onclick="toggleText(this, \'' +
+                fullText.replace(/'/g, "\\'") + '\')">展开更多</a>';
+        }
+    }
+</script>
+</body>
+</html>
