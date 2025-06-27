@@ -53,7 +53,21 @@ const routes = [
                     title: '海洋生物AI助手',
                     icon: 'Setting'
                 }
-            }
+            },
+            {
+                            path: 'marineBiologyImageApi',
+                            name: 'marineBiologyImageApi',
+                            component: () => import('../views/Index.vue'),
+                            meta: {
+                                title: '海洋生物识别系统',
+                                icon: 'Setting'
+                            }
+                        },
+{
+  path: '/marine/detail/:id',
+  name: 'MarineDetail',
+  component: () => import('@/views/Detail.vue') // 路径根据你实际文件位置调整
+}
     ]
   }
 ]

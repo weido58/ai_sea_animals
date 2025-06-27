@@ -3,12 +3,14 @@ import { ElMessage } from 'element-plus'
 
 // 创建axios实例
 const request = axios.create({
-  baseURL: '/api', // 基础URL
-  timeout: 100000,  // 请求超时时间
+  baseURL: 'http://localhost:8080/mrsp_server',
+  timeout: 100000,
   headers: {
     'Content-Type': 'application/json;charset=UTF-8'
   }
 })
+
+
 
 // 请求拦截器
 request.interceptors.request.use(
@@ -131,16 +133,17 @@ const http = {
   },
 
   // 文件上传
-  upload(url, formData) {
-    return request({
-      method: 'post',
-      url,
-      data: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-  }
+upload(url, formData) {
+  return request({
+    method: 'post',
+    url,
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
 }
 
 export default http

@@ -120,7 +120,8 @@ const menuItems = [
   { path: '/dashboard', title: '仪表板', icon: 'House' },
   { path: '/users', title: '用户管理', icon: 'User' },
   { path: '/settings', title: '系统设置', icon: 'Setting' },
-    { path: '/MarineBiology', title: '海洋生物AI助手', icon: 'Setting' }
+    { path: '/MarineBiology', title: '海洋生物AI助手', icon: 'Setting' },
+      { path: '/marineBiologyImageApi', title: '海洋生物识别系统', icon: 'Setting' }
 ]
 
 // 计算当前激活的菜单项

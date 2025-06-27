@@ -46,6 +46,10 @@ langchain4j:
       model-name: deepseek-chat
 # 通义千问配置
 qwen:
+  api:
+    key: sk-9a404f2f05c14a76a1a219a09859a904
+    endpoint: https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation
+    model: qwen-vl-plus
   api-key: sk-9a404f2f05c14a76a1a219a09859a904
   chat-model: qwen-plus
   embedding-model: text-embedding-v1
@@ -58,4 +62,5 @@ deepseek:
   timeout: 60
   max-tokens: 4000
   temperature: 0.3
+
 
